@@ -3,7 +3,7 @@ import { IsNotEmpty, IsString } from 'class-validator';
 
 export class User {
   @ApiProperty({
-    example: '1',
+    example: '2b01523b-81b2-44dd-bed3-843e868a41bd',
     description: 'ID',
     uniqueItems: true,
     nullable: false,
