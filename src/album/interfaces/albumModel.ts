@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-export class Track {
+export class Album {
   @ApiProperty({
     example: '2b01523b-81b2-44dd-bed3-843e868a41bd',
     description: 'ID',
@@ -13,14 +13,22 @@ export class Track {
   id: string;
 
   @ApiProperty({
-    example: 'Sting',
+    example: 'Album1',
     description: 'Name',
-    uniqueItems: true,
     nullable: false,
   })
   @IsNotEmpty()
   @IsString()
   name: string;
+
+  @ApiProperty({
+    example: 2000,
+    description: 'Year',
+    nullable: false,
+  })
+  @IsNotEmpty()
+  @IsNumber()
+  year: number;
 
   @ApiProperty({
     example: '2b01523b-81b2-44dd-bed3-843e868a41bv',
@@ -31,23 +39,4 @@ export class Track {
   @IsNotEmpty()
   @IsString()
   artistId: string;
-
-  @ApiProperty({
-    example: '2b01523b-81b2-44dd-bed3-843e868a41bv',
-    description: 'Album Id',
-    uniqueItems: true,
-    nullable: false,
-  })
-  @IsNotEmpty()
-  @IsString()
-  albumId: string;
-
-  @ApiProperty({
-    example: 15,
-    description: 'Duration',
-    nullable: false,
-  })
-  @IsNotEmpty()
-  @IsNumber()
-  duration: number;
 }

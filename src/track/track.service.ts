@@ -1,4 +1,11 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
+import { ArtistsService } from 'src/artists/artists.service';
 import {
   v4 as uuid,
   validate as uuidValidate,
@@ -10,6 +17,8 @@ import { ITrack } from './interfaces/track.interface';
 
 @Injectable()
 export class TrackService {
+  @Inject(forwardRef(() => ArtistsService))
+  private readonly artists: ArtistsService;
   private tracks: ITrack[] = [];
 
   getTracks() {
@@ -31,7 +40,7 @@ export class TrackService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    // TODO refers to other
+
     const newTrack = {
       id: uuid(),
       name: name,
