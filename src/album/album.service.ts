@@ -10,7 +10,7 @@ import { IAlbum } from './interfaces/album.interface';
 
 @Injectable()
 export class AlbumService {
-  private albums: IAlbum[] = [];
+  public albums: IAlbum[] = [];
 
   getAlbums() {
     return this.albums;

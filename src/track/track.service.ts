@@ -19,7 +19,7 @@ import { ITrack } from './interfaces/track.interface';
 export class TrackService {
   @Inject(forwardRef(() => ArtistsService))
   private readonly artists: ArtistsService;
-  private tracks: ITrack[] = [];
+  public tracks: ITrack[] = [];
 
   getTracks() {
     return this.tracks;
