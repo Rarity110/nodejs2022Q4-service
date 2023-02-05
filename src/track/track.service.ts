@@ -1,11 +1,7 @@
-import {
-  forwardRef,
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { AlbumService } from 'src/album/album.service';
 import { ArtistsService } from 'src/artists/artists.service';
+import { FavoritesService } from 'src/favorites/favorites.service';
 import {
   v4 as uuid,
   validate as uuidValidate,
@@ -17,9 +13,14 @@ import { ITrack } from './interfaces/track.interface';
 
 @Injectable()
 export class TrackService {
-  @Inject(forwardRef(() => ArtistsService))
-  private readonly artists: ArtistsService;
+  // @Inject(forwardRef(() => ArtistsService))
+  // private readonly artists: ArtistsService;
   public tracks: ITrack[] = [];
+  // constructor(
+  //   public artists: ArtistsService,
+  //   public favorites: FavoritesService,
+  //   public album: AlbumService,
+  // ) {}
 
   getTracks() {
     return this.tracks;
@@ -34,7 +35,7 @@ export class TrackService {
   createTrack(createUserDto: CreateTrackDto) {
     const { name, artistId, albumId, duration } = createUserDto;
 
-    if (!name || !artistId || !albumId || !duration) {
+    if (!name || !duration) {
       throw new HttpException(
         'Request body does not contain required fields',
         HttpStatus.BAD_REQUEST,
@@ -55,10 +56,15 @@ export class TrackService {
   }
 
   updateTrack(updateTrackDto: UpdateTrackDto, id: string) {
-    const { name, artistId, albumId, duration } = updateTrackDto;
     this.isNotUuidExeption(id);
-
     const track = this.track(id);
+    const { name, artistId, albumId, duration } = updateTrackDto;
+    if (typeof name !== 'string') {
+      throw new HttpException(
+        'Request body does not contain required fields',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
 
     if (name) track.name = name;
     if (artistId) track.artistId = artistId;
@@ -76,6 +82,12 @@ export class TrackService {
     const newTracks = this.tracks.filter((item) => item.id !== id);
 
     this.tracks = newTracks;
+
+    // const favoriteTrack = this.favorites.favorites.tracks.filter(
+    //   (item) => item.id !== id,
+    // );
+
+    // if (favoriteTrack) this.favorites.deleteFavoriteTrack(id);
   }
 
   isNotUuidExeption = (id: string): void => {
@@ -86,13 +98,13 @@ export class TrackService {
   };
 
   track = (id: string): ITrack => {
-    const user = this.tracks.find((user) => user.id === id);
-    if (!user) {
+    const track = this.tracks.find((user) => user.id === id);
+    if (!track) {
       throw new HttpException(
         `User with ${id} does not exist`,
         HttpStatus.NOT_FOUND,
       );
     }
-    return user;
+    return track;
   };
 }

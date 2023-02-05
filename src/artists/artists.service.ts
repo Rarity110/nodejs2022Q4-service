@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { TrackService } from 'src/track/track.service';
 import {
   v4 as uuid,
   validate as uuidValidate,
@@ -11,7 +12,8 @@ import { IArtist } from './interfaces.ts/artist.interface';
 
 @Injectable()
 export class ArtistsService {
-  private artists: IArtist[] = [];
+  public artists: IArtist[] = [];
+  constructor(public tracks: TrackService) {}
 
   getArtists() {
     return this.artists;
@@ -45,12 +47,18 @@ export class ArtistsService {
 
   updateArtist(updateArtistDto: UpdateArtistDto, id: string) {
     const { name, grammy } = updateArtistDto;
+    if (typeof name !== 'string' || typeof grammy !== 'boolean') {
+      throw new HttpException(
+        'Request body does not contain required fields',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     this.isNotUuidExeption(id);
 
     const artist = this.artist(id);
 
-    if (name) artist.name = name;
-    if (grammy) artist.grammy = grammy;
+    artist.name = name;
+    artist.grammy = grammy;
 
     return artist;
   }
@@ -63,6 +71,10 @@ export class ArtistsService {
     const newArtists = this.artists.filter((item) => item.id !== id);
 
     this.artists = newArtists;
+
+    this.tracks.tracks.forEach((track) => {
+      if (track.artistId === id) track.artistId = null;
+    });
   }
 
   isNotUuidExeption = (id: string): void => {

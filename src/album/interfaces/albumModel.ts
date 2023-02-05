@@ -34,9 +34,9 @@ export class Album {
     example: '2b01523b-81b2-44dd-bed3-843e868a41bv',
     description: 'Artist Id',
     uniqueItems: true,
-    nullable: false,
+    // nullable: false,
   })
-  @IsNotEmpty()
-  @IsString()
-  artistId: string;
+  // @IsNotEmpty()
+  // @IsString()
+  artistId: string | null;
 }

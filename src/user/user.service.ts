@@ -54,6 +54,9 @@ export class UserService {
   }
 
   updateUserPassword(updatePasswordDto: UpdatePasswordDto, id: string) {
+    if (!updatePasswordDto.newPassword && !updatePasswordDto.oldPassword) {
+      throw new HttpException('Id is not uuid', HttpStatus.BAD_REQUEST);
+    }
     this.isNotUuidExeption(id);
 
     const user = this.user(id);

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 export class UpdateTrackDto {
   @ApiProperty({
@@ -13,20 +13,20 @@ export class UpdateTrackDto {
     example: '2b01523b-81b2-44dd-bed3-843e868a41bd',
     description: 'Artist Id',
   })
-  @IsString()
+  // @IsString()
   readonly artistId: string | null; // refers to Artist
 
   @ApiProperty({
     example: '2b01523b-81b2-44dd-bed3-843e868a41bd',
     description: 'Album Id',
   })
-  @IsString()
+  // @IsString()
   readonly albumId: string | null; // refers to Album
 
   @ApiProperty({
     example: '2b01523b-81b2-44dd-bed3-843e868a41bd',
     description: 'Duration',
   })
-  @IsString()
+  @IsNumber()
   readonly duration: number; // integer number
 }

@@ -12,7 +12,7 @@ export class CreateAlbumDto {
   readonly name: string;
 
   @ApiProperty({
-    example: '2000',
+    example: 2000,
     description: 'Year',
   })
   @IsNotEmpty()
@@ -23,6 +23,6 @@ export class CreateAlbumDto {
     example: '2b01523b-81b2-44dd-bed3-843e868a41bd',
     description: 'Artist Id',
   })
-  @IsString()
+  // @IsString()
   readonly artistId: string | null; // refers to Artist
 }

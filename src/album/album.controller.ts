@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   HttpStatus,
   Param,
   Post,
@@ -104,6 +105,7 @@ export class AlbumController {
     status: HttpStatus.NO_CONTENT,
     description: 'The album has been successfully deleted.',
   })
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Id is not uuid.',

@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   HttpStatus,
   Param,
   Post,
@@ -16,8 +17,8 @@ import { UpdateArtistDto } from './dto/update-artist.dto';
 import { IArtistCreatedResponse } from './interfaces.ts/artistCreatedResponse';
 import { Artist } from './interfaces.ts/artistModel';
 
-@ApiTags('artists')
-@Controller('artists')
+@ApiTags('artist')
+@Controller('artist')
 export class ArtistsController {
   constructor(private readonly artistService: ArtistsService) {}
 
@@ -104,6 +105,7 @@ export class ArtistsController {
     status: HttpStatus.NO_CONTENT,
     description: 'The artist has been successfully deleted.',
   })
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Id is not uuid.',

@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   Post,
   Put,
@@ -15,6 +16,7 @@ import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UserService } from './user.service';
 import { IUserCreatedResponse } from './interfaces/userCreatedResponse';
 import { User } from './interfaces/userModel';
+import { IUserUpdatedResponse } from './interfaces/userUpdatedResponse';
 
 @ApiTags('user')
 @Controller('user')
@@ -71,6 +73,9 @@ export class UserController {
     const response: IUserCreatedResponse = {
       id: newUser.id,
       login: newUser.login,
+      version: newUser.version,
+      createdAt: newUser.createdAt,
+      updatedAt: newUser.updatedAt,
     };
     return response;
   }
@@ -98,7 +103,15 @@ export class UserController {
     @Body() updatePasswordDto: UpdatePasswordDto,
     @Param('id') id: string,
   ) {
-    return this.userService.updateUserPassword(updatePasswordDto, id);
+    const newUser = this.userService.updateUserPassword(updatePasswordDto, id);
+    const response: IUserUpdatedResponse = {
+      id: newUser.id,
+      login: newUser.login,
+      version: newUser.version,
+      createdAt: newUser.createdAt,
+      updatedAt: newUser.updatedAt,
+    };
+    return response;
   }
 
   @Delete(':id')
@@ -107,6 +120,7 @@ export class UserController {
     status: HttpStatus.NO_CONTENT,
     description: 'The user has been successfully deleted.',
   })
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Id is not uuid.',

@@ -1,4 +1,4 @@
-export interface IUserCreatedResponse {
+export interface IUserUpdatedResponse {
   readonly id: string;
   readonly login: string;
   readonly version: number;

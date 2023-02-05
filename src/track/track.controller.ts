@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   HttpStatus,
   Param,
   Post,
@@ -63,10 +64,10 @@ export class TrackController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Request body does not contain required fields.',
   })
-  @ApiResponse({
-    status: HttpStatus.CONFLICT,
-    description: 'Track login already exists.',
-  })
+  // @ApiResponse({
+  //   status: HttpStatus.CONFLICT,
+  //   description: 'Track login already exists.',
+  // })
   createTrack(@Body() createTrackDto: CreateTrackDto) {
     const newTrack = this.trackService.createTrack(createTrackDto);
     const response: ITrackCreatedResponse = {
@@ -107,6 +108,7 @@ export class TrackController {
     status: HttpStatus.NO_CONTENT,
     description: 'The track has been successfully deleted.',
   })
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Id is not uuid.',

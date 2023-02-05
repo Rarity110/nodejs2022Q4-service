@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { validate as uuidValidate, version as uuidVersion } from 'uuid';
 import { AlbumService } from 'src/album/album.service';
 import { ArtistsService } from 'src/artists/artists.service';
@@ -16,25 +22,22 @@ enum categories {
 
 @Injectable()
 export class FavoritesService {
-  //   @Inject(forwardRef(() => ArtistsService))
-  //   private readonly artists: ArtistsService;
-
-  //   @Inject(forwardRef(() => TrackService))
-  //   private readonly tracks: TrackService;
-
-  //   @Inject(forwardRef(() => AlbumService))
-  //   private readonly album: AlbumService;
-
-  private favorites: IFavorites = {
+  // @Inject(forwardRef(() => ArtistsService))
+  // //   private readonly artists: ArtistsService;
+  // @Inject(forwardRef(() => TrackService))
+  // //   private readonly tracks: TrackService;
+  // @Inject(forwardRef(() => AlbumService))
+  // //   private readonly album: AlbumService;
+  public favorites: IFavorites = {
     artists: [],
     albums: [],
     tracks: [],
   };
 
   constructor(
-    private readonly artists: ArtistsService,
-    private readonly tracks: TrackService,
-    private readonly album: AlbumService,
+    public artists: ArtistsService,
+    public tracks: TrackService,
+    public album: AlbumService,
   ) {}
 
   getFavorites() {
