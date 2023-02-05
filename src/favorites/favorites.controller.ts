@@ -46,8 +46,8 @@ export class FavoritesController {
     return this.favoritesService.addFavoriteTrack(id);
   }
 
-  //   @Delete('track/:id')
-  @Delete('track')
+  @Delete('track/:id')
+  // @Delete('track/:id')
   @ApiOperation({ summary: 'Delete track from favorites' })
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
@@ -62,12 +62,9 @@ export class FavoritesController {
     status: HttpStatus.NOT_FOUND,
     description: 'Track is not favorite.',
   })
-  removeTrack(@Body() id: string) {
+  removeTrack(@Param('id') id: string) {
     return this.favoritesService.deleteFavoriteTrack(id);
   }
-  //   removeTrack(@Param('id') id: string) {
-  //     return this.favoritesService.deleteFavoriteTrack(id);
-  //   }
 
   @Post('album/:id')
   @ApiOperation({ summary: 'Add album to favorites' })
@@ -93,6 +90,7 @@ export class FavoritesController {
     status: HttpStatus.NO_CONTENT,
     description: 'The album has been successfully deleted from favorites.',
   })
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Id is not uuid.',
@@ -129,6 +127,7 @@ export class FavoritesController {
     status: HttpStatus.NO_CONTENT,
     description: 'The artist has been successfully deleted from favorites.',
   })
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Id is not uuid.',

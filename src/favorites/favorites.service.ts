@@ -23,11 +23,11 @@ enum categories {
 @Injectable()
 export class FavoritesService {
   // @Inject(forwardRef(() => ArtistsService))
-  // //   private readonly artists: ArtistsService;
+  // // public artists: ArtistsService;
   // @Inject(forwardRef(() => TrackService))
-  // //   private readonly tracks: TrackService;
+  // // public tracks: TrackService;
   // @Inject(forwardRef(() => AlbumService))
-  // //   private readonly album: AlbumService;
+  // public album: AlbumService;
   public favorites: IFavorites = {
     artists: [],
     albums: [],
@@ -35,8 +35,11 @@ export class FavoritesService {
   };
 
   constructor(
+    @Inject(forwardRef(() => ArtistsService))
     public artists: ArtistsService,
+    @Inject(forwardRef(() => TrackService))
     public tracks: TrackService,
+    @Inject(forwardRef(() => AlbumService))
     public album: AlbumService,
   ) {}
 
@@ -54,7 +57,7 @@ export class FavoritesService {
   deleteFavoriteTrack(id: string) {
     this.isNotUuidExeption(id);
 
-    this.isFavoriteItem(id, categories.TRACK);
+    // this.isFavoriteItem(id, categories.TRACK);
 
     const newFavoriteTracks = this.favorites.tracks.filter(
       (item) => item.id !== id,
@@ -73,7 +76,7 @@ export class FavoritesService {
   deleteFavoriteArtist(id: string) {
     this.isNotUuidExeption(id);
 
-    this.isFavoriteItem(id, categories.ARTIST);
+    // this.isFavoriteItem(id, categories.ARTIST);
 
     const newFavoriteArtist = this.favorites.artists.filter(
       (item) => item.id !== id,
@@ -92,7 +95,7 @@ export class FavoritesService {
   deleteFavoriteAlbum(id: string) {
     this.isNotUuidExeption(id);
 
-    this.isFavoriteItem(id, categories.ALBUM);
+    // this.isFavoriteItem(id, categories.ALBUM);
 
     const newFavoriteAlbum = this.favorites.albums.filter(
       (item) => item.id !== id,
@@ -109,12 +112,20 @@ export class FavoritesService {
   };
 
   isItem = (id: string, category: string) => {
-    const item =
-      category === categories.TRACK
-        ? this.tracks.getTrack(id)
-        : category === categories.ALBUM
-        ? this.album.getAlbum(id)
-        : this.artists.getArtist(id);
+    let item: ITrack | IAlbum | IArtist;
+
+    if (category === categories.TRACK) {
+      item = this.tracks.getTracks().filter((el) => el.id === id)[0];
+    }
+
+    if (category === categories.ALBUM) {
+      item = this.album.getAlbums().filter((el) => el.id === id)[0];
+    }
+
+    if (category === categories.ARTIST) {
+      item = this.artists.getArtists().filter((el) => el.id === id)[0];
+    }
+
     if (!item) {
       throw new HttpException(
         `Item with ${id} does not exist`,
