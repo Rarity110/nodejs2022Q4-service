@@ -1,4 +1,11 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
+import { FavoritesService } from 'src/favorites/favorites.service';
 import { TrackService } from 'src/track/track.service';
 import {
   v4 as uuid,
@@ -13,7 +20,12 @@ import { IAlbum } from './interfaces/album.interface';
 export class AlbumService {
   public albums: IAlbum[] = [];
 
-  constructor(public tracks: TrackService) {}
+  constructor(
+    @Inject(forwardRef(() => TrackService))
+    public tracks: TrackService,
+    @Inject(forwardRef(() => FavoritesService))
+    public favorite: FavoritesService,
+  ) {}
 
   getAlbums() {
     return this.albums;
@@ -22,7 +34,15 @@ export class AlbumService {
   getAlbum(id: string) {
     this.isNotUuidExeption(id);
 
-    return this.album(id);
+    const album = this.albums.filter((el) => el.id === id)[0];
+    if (!album) {
+      throw new HttpException(
+        `Album with ${id} does not exist`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return album;
   }
 
   createAlbum(createUserDto: CreateAlbumDto) {
@@ -58,7 +78,13 @@ export class AlbumService {
 
     this.isNotUuidExeption(id);
 
-    const album = this.album(id);
+    const album = this.albums.filter((el) => el.id === id)[0];
+    if (!album) {
+      throw new HttpException(
+        `Album with ${id} does not exist`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
 
     if (name) album.name = name;
     if (year) album.year = year;
@@ -70,14 +96,22 @@ export class AlbumService {
   deleteAlbum(id: string) {
     this.isNotUuidExeption(id);
 
-    this.album(id);
+    const album = this.albums.filter((el) => el.id === id)[0];
+    if (!album) {
+      throw new HttpException(
+        `Album with ${id} does not exist`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
 
-    const newAlbums = this.albums.filter((item) => item.id !== id);
+    this.albums = this.albums.filter((item) => item.id !== id);
 
-    this.albums = newAlbums;
+    this.tracks.tracks.forEach((el) => {
+      if (el.albumId === id) el.albumId = null;
+    });
 
-    this.tracks.tracks.forEach((track) => {
-      if (track.albumId === id) track.albumId = null;
+    this.favorite.favorites.albums.forEach((el) => {
+      if (el.id === id) el.id = null;
     });
   }
 
@@ -88,14 +122,14 @@ export class AlbumService {
     }
   };
 
-  album = (id: string): IAlbum => {
-    const user = this.albums.find((user) => user.id === id);
-    if (!user) {
-      throw new HttpException(
-        `User with ${id} does not exist`,
-        HttpStatus.NOT_FOUND,
-      );
-    }
-    return user;
-  };
+  // findAlbum = (id: string): IAlbum => {
+  //   const album = this.albums.filter((el) => el.id === id)[0];
+  //   if (!album) {
+  //     throw new HttpException(
+  //       `Album with ${id} does not exist`,
+  //       HttpStatus.NOT_FOUND,
+  //     );
+  //   }
+  //   return album;
+  // };
 }

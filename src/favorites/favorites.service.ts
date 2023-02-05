@@ -22,12 +22,6 @@ enum categories {
 
 @Injectable()
 export class FavoritesService {
-  // @Inject(forwardRef(() => ArtistsService))
-  // // public artists: ArtistsService;
-  // @Inject(forwardRef(() => TrackService))
-  // // public tracks: TrackService;
-  // @Inject(forwardRef(() => AlbumService))
-  // public album: AlbumService;
   public favorites: IFavorites = {
     artists: [],
     albums: [],
@@ -138,12 +132,12 @@ export class FavoritesService {
   isFavoriteItem = (id: string, category: string) => {
     const item =
       category === categories.TRACK
-        ? this.favorites.tracks.find((item) => item.id === id)
+        ? this.favorites.tracks.filter((el) => el.id === id)[0]
         : category === categories.ALBUM
-        ? this.favorites.albums.find((item) => item.id === id)
-        : this.favorites.artists.find((item) => item.id === id);
+        ? this.favorites.albums.filter((el) => el.id === id)[0]
+        : this.favorites.artists.filter((el) => el.id === id)[0];
 
-    this.favorites.tracks.find((item) => item.id === id);
+    // this.favorites.tracks.find((el) => el.id === id);
     if (!item) {
       throw new HttpException(
         `Item with ${id} is not favorite`,

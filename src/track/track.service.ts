@@ -1,4 +1,11 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
+import { FavoritesService } from 'src/favorites/favorites.service';
 // import { AlbumService } from 'src/album/album.service';
 // import { ArtistsService } from 'src/artists/artists.service';
 // import { FavoritesService } from 'src/favorites/favorites.service';
@@ -13,14 +20,12 @@ import { ITrack } from './interfaces/track.interface';
 
 @Injectable()
 export class TrackService {
-  // @Inject(forwardRef(() => ArtistsService))
-  // private readonly artists: ArtistsService;
   public tracks: ITrack[] = [];
-  // constructor(
-  //   public artists: ArtistsService,
-  //   public favorites: FavoritesService,
-  //   public album: AlbumService,
-  // ) {}
+
+  constructor(
+    @Inject(forwardRef(() => FavoritesService))
+    public favorite: FavoritesService,
+  ) {}
 
   getTracks() {
     return this.tracks;
@@ -28,8 +33,14 @@ export class TrackService {
 
   getTrack(id: string) {
     this.isNotUuidExeption(id);
-
-    return this.track(id);
+    const track = this.tracks.filter((el) => el.id === id)[0];
+    if (!track) {
+      throw new HttpException(
+        `Track with ${id} does not exist`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return track;
   }
 
   createTrack(createUserDto: CreateTrackDto) {
@@ -57,7 +68,13 @@ export class TrackService {
 
   updateTrack(updateTrackDto: UpdateTrackDto, id: string) {
     this.isNotUuidExeption(id);
-    const track = this.track(id);
+    const track = this.tracks.filter((el) => el.id === id)[0];
+    if (!track) {
+      throw new HttpException(
+        `Track with ${id} does not exist`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
     const { name, artistId, albumId, duration } = updateTrackDto;
     if (typeof name !== 'string') {
       throw new HttpException(
@@ -77,17 +94,21 @@ export class TrackService {
   deleteTrack(id: string) {
     this.isNotUuidExeption(id);
 
-    this.track(id);
+    const track = this.tracks.filter((el) => el.id === id)[0];
+    if (!track) {
+      throw new HttpException(
+        `Track with ${id} does not exist`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
 
-    const newTracks = this.tracks.filter((item) => item.id !== id);
+    this.tracks = this.tracks.filter((item) => item.id !== id);
 
-    this.tracks = newTracks;
+    const favoriteTrack = this.favorite.tracks.tracks.filter(
+      (item) => item.id !== id,
+    );
 
-    // const favoriteTrack = this.favorites.favorites.tracks.filter(
-    //   (item) => item.id !== id,
-    // );
-
-    // if (favoriteTrack) this.favorites.deleteFavoriteTrack(id);
+    if (favoriteTrack) this.favorite.deleteFavoriteTrack(id);
   }
 
   isNotUuidExeption = (id: string): void => {
@@ -97,14 +118,14 @@ export class TrackService {
     }
   };
 
-  track = (id: string): ITrack => {
-    const track = this.tracks.find((user) => user.id === id);
-    if (!track) {
-      throw new HttpException(
-        `User with ${id} does not exist`,
-        HttpStatus.NOT_FOUND,
-      );
-    }
-    return track;
-  };
+  // findTrack = (id: string): ITrack => {
+  //   const track = this.tracks.filter((el) => el.id === id)[0];
+  //   if (!track) {
+  //     throw new HttpException(
+  //       `Track with ${id} does not exist`,
+  //       HttpStatus.NOT_FOUND,
+  //     );
+  //   }
+  //   return track;
+  // };
 }

@@ -22,7 +22,7 @@ export class UserService {
   getUser(id: string) {
     this.isNotUuidExeption(id);
 
-    return this.user(id);
+    return this.findUser(id);
   }
 
   createUser(createUserDto: CreateUserDto) {
@@ -35,7 +35,7 @@ export class UserService {
       );
     }
 
-    if (this.users.find((user) => user.login === login)) {
+    if (this.users.filter((user) => user.login === login)[0]) {
       throw new HttpException('User login already exists', HttpStatus.CONFLICT);
     }
 
@@ -59,7 +59,7 @@ export class UserService {
     }
     this.isNotUuidExeption(id);
 
-    const user = this.user(id);
+    const user = this.findUser(id);
 
     if (updatePasswordDto.oldPassword !== user.password) {
       throw new HttpException('OldPassword is wrong', HttpStatus.FORBIDDEN);
@@ -75,7 +75,7 @@ export class UserService {
   deleteUser(id: string) {
     this.isNotUuidExeption(id);
 
-    this.user(id);
+    this.findUser(id);
 
     const newUsers = this.users.filter((item) => item.id !== id);
 
@@ -89,8 +89,8 @@ export class UserService {
     }
   };
 
-  user = (id: string): IUser => {
-    const user = this.users.find((user) => user.id === id);
+  findUser = (id: string): IUser => {
+    const user = this.users.filter((el) => el.id === id)[0];
     if (!user) {
       throw new HttpException(
         `User with ${id} does not exist`,

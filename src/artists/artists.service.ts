@@ -1,4 +1,12 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
+import { AlbumService } from 'src/album/album.service';
+import { FavoritesService } from 'src/favorites/favorites.service';
 import { TrackService } from 'src/track/track.service';
 import {
   v4 as uuid,
@@ -13,7 +21,14 @@ import { IArtist } from './interfaces.ts/artist.interface';
 @Injectable()
 export class ArtistsService {
   public artists: IArtist[] = [];
-  constructor(public tracks: TrackService) {}
+  constructor(
+    @Inject(forwardRef(() => TrackService))
+    public tracks: TrackService,
+    @Inject(forwardRef(() => FavoritesService))
+    public favorite: FavoritesService,
+    @Inject(forwardRef(() => AlbumService))
+    public albums: AlbumService,
+  ) {}
 
   getArtists() {
     return this.artists;
@@ -22,7 +37,14 @@ export class ArtistsService {
   getArtist(id: string) {
     this.isNotUuidExeption(id);
 
-    return this.artist(id);
+    const artist = this.artists.filter((el) => el.id === id)[0];
+    if (!artist) {
+      throw new HttpException(
+        `Artist with ${id} does not exist`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return artist;
   }
 
   createArtist(createUserDto: CreateArtistDto) {
@@ -55,7 +77,13 @@ export class ArtistsService {
     }
     this.isNotUuidExeption(id);
 
-    const artist = this.artist(id);
+    const artist = this.artists.filter((el) => el.id === id)[0];
+    if (!artist) {
+      throw new HttpException(
+        `Artist with ${id} does not exist`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
 
     artist.name = name;
     artist.grammy = grammy;
@@ -66,14 +94,22 @@ export class ArtistsService {
   deleteArtist(id: string) {
     this.isNotUuidExeption(id);
 
-    this.artist(id);
+    const artist = this.artists.filter((el) => el.id === id)[0];
+    if (!artist) {
+      throw new HttpException(
+        `Artist with ${id} does not exist`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
 
-    const newArtists = this.artists.filter((item) => item.id !== id);
-
-    this.artists = newArtists;
+    this.artists = this.artists.filter((item) => item.id !== id);
 
     this.tracks.tracks.forEach((track) => {
       if (track.artistId === id) track.artistId = null;
+    });
+
+    this.favorite.favorites.artists.forEach((el) => {
+      if (el.id === id) el.id = null;
     });
   }
 
@@ -84,14 +120,14 @@ export class ArtistsService {
     }
   };
 
-  artist = (id: string): IArtist => {
-    const user = this.artists.find((user) => user.id === id);
-    if (!user) {
-      throw new HttpException(
-        `User with ${id} does not exist`,
-        HttpStatus.NOT_FOUND,
-      );
-    }
-    return user;
-  };
+  // findArtist = (id: string): IArtist => {
+  //   const artist = this.artists.filter((el) => el.id === id)[0];
+  //   if (!artist) {
+  //     throw new HttpException(
+  //       `Artist with ${id} does not exist`,
+  //       HttpStatus.NOT_FOUND,
+  //     );
+  //   }
+  //   return artist;
+  // };
 }
